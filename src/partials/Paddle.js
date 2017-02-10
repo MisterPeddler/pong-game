@@ -1,4 +1,4 @@
-import { SVG_NS } from '../settings';
+import { SVG_NS , KEYS } from '../settings';
 
 export default class Paddle {
   constructor(boardHeight, width, height, x, y, up, down) {
@@ -9,18 +9,24 @@ export default class Paddle {
     this.y = y;
     this.speed = 10;
     this.score = 0;
+    this.gameIsNotPaused = true;
 
     document.addEventListener('keydown', event => {
+    //  console.log('key pressed');
      switch (event.keyCode) {
        case up:
-         this.up();
-
+       if(this.gameIsNotPaused){ this.up();}
          break;
-       case down:
-        this.down();
 
+       case down:
+        if(this.gameIsNotPaused){this.down();}
+         break;
+
+      case KEYS.spaceBar:
+        this.gameIsNotPaused = !this.gameIsNotPaused;
          break;
      }
+
      });
 
 
@@ -28,12 +34,10 @@ export default class Paddle {
 
 
   up(){
-    console.log('up');
     this.y = Math.max(0, this.y - this.speed);
   }
 
   down(){
-   console.log('down');
    this.y = Math.min(this.boardHeight - this.height, this.y + this.speed);
  }
 

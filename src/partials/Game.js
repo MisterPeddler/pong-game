@@ -6,6 +6,9 @@ import Ball from './Ball';
 export default class Game {
 
 	constructor(element, width, height) {
+
+		this.pause = false;
+
 		this.element = element;
 		this.width = width;
 		this.height = height;
@@ -36,11 +39,16 @@ export default class Game {
 
 		this.ball = new Ball(8, this.width, this.height);
 
+		document.addEventListener('keydown', event => {
+		 if(event.keyCode === KEYS.spaceBar){
+			 this.pause = !this.pause;
+		 }});
+		 
 	}
 
-	
-
 	render() {
+
+ 		if(this.pause){return}
 
 		this.gameElement.innerHTML = '';
 
@@ -54,6 +62,7 @@ export default class Game {
 		this.paddle1.render(svg);
 		this.paddle2.render(svg);
 		this.ball.render(svg);
+
 
 	}
 
