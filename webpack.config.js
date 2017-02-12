@@ -49,7 +49,17 @@ module.exports = {
 			poll: true
 		}
 	},
+	resolve: {
+    alias: {
+        'jquery-ui': 'jquery-ui-dist/jquery-ui.js'
+    }
+},
 	plugins: [
 		new OpenBrowserPlugin({ url: 'http://localhost:3000/'}),
+		new webpack.ProvidePlugin({
+			"$":"jquery",
+		 "jQuery":"jquery",
+		 "window.jQuery":"jquery"
+    })
 	]
 };
