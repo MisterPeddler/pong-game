@@ -10,23 +10,23 @@ export default class Paddle {
         this.height = height;
         this.x = x;
         this.y = y;
-        this.speed = 40;
+        this.speed = 5;
         this.score = 0;
         this.gameIsNotPaused = true;
 
+        this.upPressed = false;
+        this.downPressed = false;
+
         document.addEventListener('keydown', event => {
-            //  console.log('key pressed');
             switch (event.keyCode) {
                 case up:
-                    if (this.gameIsNotPaused) {
-                        this.up();
-                    }
+                      console.log('up pressed');
+                      this.upPressed = true;
                     break;
 
                 case down:
-                    if (this.gameIsNotPaused) {
-                        this.down();
-                    }
+                      this.downPressed = true;
+                        console.log('down pressed');
                     break;
 
                 case KEYS.spaceBar:
@@ -36,7 +36,19 @@ export default class Paddle {
 
         });
 
+        document.addEventListener('keyup', event => {
+            switch (event.keyCode) {
+                case up:
+                      this.upPressed = false;
+                        console.log('up released');
+                    break;
 
+                case down:
+                    this.downPressed = false;
+                      console.log('down released');
+                    break;
+            }
+        });
     }
 
 
@@ -57,10 +69,10 @@ export default class Paddle {
         return [leftX, rightX, topY, bottomY];
     }
 
-
-
-
     render(svg) {
+
+      if(this.upPressed){this.up();}
+      else if(this.downPressed){this.down();}
 
         let paddle = document.createElementNS(SVG_NS, 'rect');
         paddle.setAttributeNS(null, 'x', this.x);
