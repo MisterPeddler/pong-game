@@ -638,27 +638,43 @@
 	        this.height = height;
 	        this.x = x;
 	        this.y = y;
-	        this.speed = 40;
+	        this.speed = 10;
 	        this.score = 0;
 	        this.gameIsNotPaused = true;
 
+	        this.upPressed = false;
+	        this.downPressed = false;
+
 	        document.addEventListener('keydown', function (event) {
-	            //  console.log('key pressed');
 	            switch (event.keyCode) {
 	                case up:
-	                    if (_this.gameIsNotPaused) {
-	                        _this.up();
-	                    }
+	                    console.log('up pressed');
+	                    _this.speed = 0;
+	                    _this.upPressed = true;
 	                    break;
 
 	                case down:
-	                    if (_this.gameIsNotPaused) {
-	                        _this.down();
-	                    }
+	                    _this.downPressed = true;
+	                    _this.speed = 0;
+	                    console.log('down pressed');
 	                    break;
 
 	                case _settings.KEYS.spaceBar:
 	                    _this.gameIsNotPaused = !_this.gameIsNotPaused;
+	                    break;
+	            }
+	        });
+
+	        document.addEventListener('keyup', function (event) {
+	            switch (event.keyCode) {
+	                case up:
+	                    _this.upPressed = false;
+	                    console.log('up released');
+	                    break;
+
+	                case down:
+	                    _this.downPressed = false;
+	                    console.log('down released');
 	                    break;
 	            }
 	        });
@@ -667,11 +683,17 @@
 	    _createClass(Paddle, [{
 	        key: 'up',
 	        value: function up() {
+	            if (this.speed < 10) {
+	                this.speed = this.speed + 0.5;
+	            }
 	            this.y = Math.max(0, this.y - this.speed);
 	        }
 	    }, {
 	        key: 'down',
 	        value: function down() {
+	            if (this.speed < 10) {
+	                this.speed = this.speed + 0.5;
+	            }
 	            this.y = Math.min(this.boardHeight - this.height, this.y + this.speed);
 	        }
 	    }, {
@@ -686,6 +708,15 @@
 	    }, {
 	        key: 'render',
 	        value: function render(svg) {
+
+	            //I think this will change speed based on processor
+	            //does the game render loop only run at a certain rate?
+
+	            if (this.upPressed) {
+	                this.up();
+	            } else if (this.downPressed) {
+	                this.down();
+	            }
 
 	            var paddle = document.createElementNS(_settings.SVG_NS, 'rect');
 	            paddle.setAttributeNS(null, 'x', this.x);

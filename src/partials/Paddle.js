@@ -10,7 +10,7 @@ export default class Paddle {
         this.height = height;
         this.x = x;
         this.y = y;
-        this.speed = 5;
+        this.speed = 10;
         this.score = 0;
         this.gameIsNotPaused = true;
 
@@ -21,11 +21,13 @@ export default class Paddle {
             switch (event.keyCode) {
                 case up:
                       console.log('up pressed');
+                      this.speed = 0;
                       this.upPressed = true;
                     break;
 
                 case down:
                       this.downPressed = true;
+                      this.speed = 0;
                         console.log('down pressed');
                     break;
 
@@ -53,10 +55,16 @@ export default class Paddle {
 
 
     up() {
+      if(this.speed < 10){
+        this.speed = this.speed + 0.5;
+      }
         this.y = Math.max(0, this.y - this.speed);
     }
 
     down() {
+      if(this.speed < 10){
+        this.speed = this.speed + 0.5;
+      }
         this.y = Math.min(this.boardHeight - this.height, this.y + this.speed);
     }
 
@@ -70,6 +78,9 @@ export default class Paddle {
     }
 
     render(svg) {
+
+      //I think this will change speed based on processor
+      //does the game render loop only run at a certain rate?
 
       if(this.upPressed){this.up();}
       else if(this.downPressed){this.down();}
