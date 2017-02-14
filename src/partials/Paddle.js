@@ -77,9 +77,6 @@ export default class Paddle {
 
     render(svg) {
 
-      //I think this will change speed based on processor
-      //does the game render loop only run at a certain rate?
-
       if(this.upPressed){this.up();}
       else if(this.downPressed){this.down();}
 

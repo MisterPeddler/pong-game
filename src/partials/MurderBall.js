@@ -12,16 +12,16 @@ export default class MurderBall {
         this.boardHeight = boardHeight;
         this.renderCount = 0;
 
-        this.murderVolley1 = new MurderVolley(5, this.boardWidth, this.boardHeight, 'black', 'red', -5, 1);
-        this.murderVolley2 = new MurderVolley(6, this.boardWidth, this.boardHeight, 'black', 'red', -4, 2);
-        this.murderVolley3 = new MurderVolley(7, this.boardWidth, this.boardHeight, 'black', 'red', -3, 3);
-        this.murderVolley4 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'red', -2, 4);
-        this.murderVolley5 = new MurderVolley(9, this.boardWidth, this.boardHeight, 'black', 'red', -1, 5);
-        this.murderVolley6 = new MurderVolley(10, this.boardWidth, this.boardHeight, 'black', 'red', 1, 5);
-        this.murderVolley7 = new MurderVolley(11, this.boardWidth, this.boardHeight, 'black', 'red', 2, 4);
-        this.murderVolley8 = new MurderVolley(12, this.boardWidth, this.boardHeight, 'black', 'red', 3, 3);
-        this.murderVolley9 = new MurderVolley(13, this.boardWidth, this.boardHeight, 'black', 'red', 4, 2);
-        this.murderVolley10 = new MurderVolley(14, this.boardWidth, this.boardHeight, 'black', 'red', 5, 1);
+        this.murderVolley1 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -5, 1);
+        this.murderVolley2 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -4, 2);
+        this.murderVolley3 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -3, 3);
+        this.murderVolley4 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -2, 4);
+        this.murderVolley5 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -1, 5);
+        this.murderVolley6 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 1, 5);
+        this.murderVolley7 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 2, 4);
+        this.murderVolley8 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 3, 3);
+        this.murderVolley9 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 4, 2);
+        this.murderVolley10 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 5, 1);
 
 
         this.murderBallIsActive = false;
@@ -29,7 +29,7 @@ export default class MurderBall {
     }
 
     release(rightOrLeft) {
-        //stops new muder balls from appearing while one is active
+        //stops new murder balls from appearing while one is active
         if (this.murderBallIsActive) {
             return;
         }
@@ -41,6 +41,7 @@ export default class MurderBall {
             this.direction = -1;
         }
 
+        //flag for tracking murder ball activity
         this.murderBallIsActive = true;
 
         //starts the murder ball in the middle
@@ -131,7 +132,6 @@ export default class MurderBall {
     }
 
     render(svg, paddle1, paddle2) {
-
 
         //updates the murder ball location every 9 render frames
         if (this.renderCount % 9 === 0) {

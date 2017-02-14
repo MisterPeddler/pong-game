@@ -1,4 +1,6 @@
-import { SVG_NS } from '../settings';
+import {
+    SVG_NS
+} from '../settings';
 
 export default class Score {
     constructor(distanceFromCenter, y, size, side, gameWidth) {
@@ -11,14 +13,14 @@ export default class Score {
 
     }
 
-    setXPos(element){
-      let elementWidth = element.getBoundingClientRect().width;
+    setXPos(element) {
+        let elementWidth = element.getBoundingClientRect().width;
 
-      if(this.side === 'LEFT'){
-        this.x = this.gameWidth/2 - elementWidth - this.distanceFromCenter;
-      }else if(this.side === 'RIGHT'){
-        this.x = this.gameWidth/2 + this.distanceFromCenter;
-      }
+        if (this.side === 'LEFT') {
+            this.x = this.gameWidth / 2 - elementWidth - this.distanceFromCenter;
+        } else if (this.side === 'RIGHT') {
+            this.x = this.gameWidth / 2 + this.distanceFromCenter;
+        }
 
     }
 

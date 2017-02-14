@@ -36,7 +36,6 @@ export default class MurderVolley {
     }
 
     stopVolley() {
-        //  this.launchVolley();
         this.volleyBallIsActive = false;
     }
 
@@ -129,9 +128,6 @@ export default class MurderVolley {
             this.stopVolley();
             this.goal(paddle2);
         }
-
-
-
 
     }
 }

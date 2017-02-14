@@ -54,7 +54,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(16);
+	__webpack_require__(18);
 
 	// create a game instance
 	var game = new _Game2.default('game', 512, 256);
@@ -466,6 +466,14 @@
 
 	var _Score2 = _interopRequireDefault(_Score);
 
+	var _MurderBall = __webpack_require__(16);
+
+	var _MurderBall2 = _interopRequireDefault(_MurderBall);
+
+	var _MurderVolley = __webpack_require__(17);
+
+	var _MurderVolley2 = _interopRequireDefault(_MurderVolley);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -495,9 +503,10 @@
 	        this.paddle2 = new _Paddle2.default(this.height, this.paddleWidth, this.paddleHeight, this.width - this.boardGap - this.paddleWidth, (this.height - this.paddleHeight) / 2, _settings.KEYS.up, _settings.KEYS.down);
 
 	        this.ball = new _Ball2.default(8, this.width, this.height);
+	        this.murderBall = new _MurderBall2.default(5, this.width, this.height);
 
-	        this.player1Score = new _Score2.default(this.width / 2 - 50, 30, 30);
-	        this.player2Score = new _Score2.default(this.width / 2 + 50, 30, 30);
+	        this.player1Score = new _Score2.default(50, 30, 30, 'LEFT', this.width);
+	        this.player2Score = new _Score2.default(50, 30, 30, 'RIGHT', this.width);
 
 	        document.addEventListener('keydown', function (event) {
 	            if (event.keyCode === _settings.KEYS.spaceBar) {
@@ -526,7 +535,8 @@
 	            this.paddle1.render(svg);
 	            this.paddle2.render(svg);
 
-	            this.ball.render(svg, this.paddle1, this.paddle2);
+	            this.murderBall.render(svg, this.paddle1, this.paddle2);
+	            this.ball.render(svg, this.paddle1, this.paddle2, this.murderBall);
 
 	            this.player1Score.render(svg, this.paddle1.score);
 	            this.player2Score.render(svg, this.paddle2.score);
@@ -638,7 +648,8 @@
 	        this.height = height;
 	        this.x = x;
 	        this.y = y;
-	        this.speed = 10;
+	        this.speed = 0;
+	        this.maxSpeed = 10;
 	        this.score = 0;
 	        this.gameIsNotPaused = true;
 
@@ -648,7 +659,6 @@
 	        document.addEventListener('keydown', function (event) {
 	            switch (event.keyCode) {
 	                case up:
-	                    console.log('up pressed');
 	                    _this.speed = 0;
 	                    _this.upPressed = true;
 	                    break;
@@ -656,7 +666,6 @@
 	                case down:
 	                    _this.downPressed = true;
 	                    _this.speed = 0;
-	                    console.log('down pressed');
 	                    break;
 
 	                case _settings.KEYS.spaceBar:
@@ -669,31 +678,32 @@
 	            switch (event.keyCode) {
 	                case up:
 	                    _this.upPressed = false;
-	                    console.log('up released');
 	                    break;
 
 	                case down:
 	                    _this.downPressed = false;
-	                    console.log('down released');
 	                    break;
 	            }
 	        });
 	    }
 
 	    _createClass(Paddle, [{
-	        key: 'up',
-	        value: function up() {
-	            if (this.speed < 10) {
+	        key: 'incrementSpeed',
+	        value: function incrementSpeed() {
+	            if (this.speed < this.maxSpeed) {
 	                this.speed = this.speed + 0.5;
 	            }
+	        }
+	    }, {
+	        key: 'up',
+	        value: function up() {
+	            this.incrementSpeed();
 	            this.y = Math.max(0, this.y - this.speed);
 	        }
 	    }, {
 	        key: 'down',
 	        value: function down() {
-	            if (this.speed < 10) {
-	                this.speed = this.speed + 0.5;
-	            }
+	            this.incrementSpeed();
 	            this.y = Math.min(this.boardHeight - this.height, this.y + this.speed);
 	        }
 	    }, {
@@ -708,9 +718,6 @@
 	    }, {
 	        key: 'render',
 	        value: function render(svg) {
-
-	            //I think this will change speed based on processor
-	            //does the game render loop only run at a certain rate?
 
 	            if (this.upPressed) {
 	                this.up();
@@ -752,9 +759,6 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	//var jQuery = require('jquery');
-	//require('jquery-ui');
-
 	var Ball = function () {
 	    function Ball(radius, boardWidth, boardHeight) {
 	        _classCallCheck(this, Ball);
@@ -762,7 +766,7 @@
 	        this.radius = radius;
 	        this.boardWidth = boardWidth;
 	        this.boardHeight = boardHeight;
-	        this.direction = 1;
+	        this.direction = Math.random() < 0.5 ? 1 : -1;
 
 	        this.ping = new Audio('public/sounds/pong-04.wav');
 
@@ -793,12 +797,8 @@
 
 	            if (hitLeft || hitRight) {
 	                this.vx = -this.vx;
-	                //  this.ping.play();
-	                //
 	            } else if (hitTop || hitBottom) {
 	                this.vy = -this.vy;
-	                //  this.ping.play();
-	                //  this.screenShake();
 	            }
 	        }
 	    }, {
@@ -815,8 +815,6 @@
 
 	                if (this.x + this.radius >= leftX && this.x + this.radius <= rightX && this.y >= topY && this.y <= bottomY) {
 	                    this.vx = -this.vx;
-
-	                    //  this.ping.play();
 	                }
 	            } else {
 	                var _paddle2 = paddle1.coordinates(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
@@ -829,8 +827,6 @@
 
 	                if (this.x - this.radius <= _rightX && this.x - this.radius >= _leftX && this.y >= _topY && this.y <= _bottomY) {
 	                    this.vx = -this.vx;
-
-	                    //  this.ping.play();
 	                }
 	            }
 	        }
@@ -843,11 +839,14 @@
 	    }, {
 	        key: 'screenShake',
 	        value: function screenShake() {
-	            $('#game').effect('shake', { times: 2, distance: 5 }, 250);
+	            $('#game').effect('shake', {
+	                times: 2,
+	                distance: 5
+	            }, 250);
 	        }
 	    }, {
 	        key: 'render',
-	        value: function render(svg, paddle1, paddle2) {
+	        value: function render(svg, paddle1, paddle2, murderBall) {
 
 	            this.x += this.vx;
 	            this.y += this.vy;
@@ -867,13 +866,24 @@
 	            var leftGoal = this.x - this.radius <= 0;
 
 	            if (rightGoal) {
-	                this.goal(paddle1);
 	                this.direction = 1;
+	                this.goal(paddle1);
+
 	                this.screenShake();
+
+	                if (Math.abs(paddle1.score - paddle2.score) === 5) {
+	                    murderBall.release('RIGHT');
+	                }
 	            } else if (leftGoal) {
-	                this.goal(paddle2);
+
 	                this.direction = -1;
+	                this.goal(paddle2);
+
 	                this.screenShake();
+
+	                if (Math.abs(paddle1.score - paddle2.score) === 5) {
+	                    murderBall.release('LEFT');
+	                }
 	            }
 	        }
 	    }]);
@@ -11127,15 +11137,29 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Score = function () {
-	    function Score(x, y, size) {
+	    function Score(distanceFromCenter, y, size, side, gameWidth) {
 	        _classCallCheck(this, Score);
 
-	        this.x = x;
+	        this.distanceFromCenter = distanceFromCenter;
+	        this.x = 0;
 	        this.y = y;
 	        this.size = size;
+	        this.gameWidth = gameWidth;
+	        this.side = side;
 	    }
 
 	    _createClass(Score, [{
+	        key: 'setXPos',
+	        value: function setXPos(element) {
+	            var elementWidth = element.getBoundingClientRect().width;
+
+	            if (this.side === 'LEFT') {
+	                this.x = this.gameWidth / 2 - elementWidth - this.distanceFromCenter;
+	            } else if (this.side === 'RIGHT') {
+	                this.x = this.gameWidth / 2 + this.distanceFromCenter;
+	            }
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render(svg, points) {
 
@@ -11148,6 +11172,8 @@
 	            score.innerHTML = points;
 
 	            svg.appendChild(score);
+
+	            this.setXPos(score);
 	        }
 	    }]);
 
@@ -11158,6 +11184,393 @@
 
 /***/ },
 /* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _settings = __webpack_require__(10);
+
+	var _Ball = __webpack_require__(13);
+
+	var _Ball2 = _interopRequireDefault(_Ball);
+
+	var _MurderVolley = __webpack_require__(17);
+
+	var _MurderVolley2 = _interopRequireDefault(_MurderVolley);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var MurderBall = function () {
+	    function MurderBall(radius, boardWidth, boardHeight) {
+	        _classCallCheck(this, MurderBall);
+
+	        this.radius = radius;
+	        this.boardWidth = boardWidth;
+	        this.boardHeight = boardHeight;
+	        this.renderCount = 0;
+
+	        this.murderVolley1 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', -5, 1);
+	        this.murderVolley2 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', -4, 2);
+	        this.murderVolley3 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', -3, 3);
+	        this.murderVolley4 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', -2, 4);
+	        this.murderVolley5 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', -1, 5);
+	        this.murderVolley6 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', 1, 5);
+	        this.murderVolley7 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', 2, 4);
+	        this.murderVolley8 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', 3, 3);
+	        this.murderVolley9 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', 4, 2);
+	        this.murderVolley10 = new _MurderVolley2.default(8, this.boardWidth, this.boardHeight, 'white', 'white', 5, 1);
+
+	        this.murderBallIsActive = false;
+	    }
+
+	    _createClass(MurderBall, [{
+	        key: 'release',
+	        value: function release(rightOrLeft) {
+	            //stops new murder balls from appearing while one is active
+	            if (this.murderBallIsActive) {
+	                return;
+	            }
+
+	            //sends the murder ball left or right based on who earned it
+	            if (rightOrLeft === 'RIGHT') {
+	                this.direction = 1;
+	            } else if (rightOrLeft === 'LEFT') {
+	                this.direction = -1;
+	            }
+
+	            //flag for tracking murder ball activity
+	            this.murderBallIsActive = true;
+
+	            //starts the murder ball in the middle
+	            this.x = this.boardWidth / 2;
+	            this.y = this.boardHeight / 2;
+
+	            this.setNewDirection();
+	        }
+
+	        //changes the direction of the murder ball
+
+	    }, {
+	        key: 'setNewDirection',
+	        value: function setNewDirection() {
+	            this.vy = 0;
+
+	            while (this.vy === 0) {
+	                this.vy = Math.floor(Math.random() * 10 - 5);
+	            }
+
+	            this.vx = this.direction * (6 - Math.abs(this.vy));
+	        }
+	    }, {
+	        key: 'stop',
+	        value: function stop() {
+	            this.murderBallIsActive = false;
+	        }
+	    }, {
+	        key: 'wallCollision',
+	        value: function wallCollision() {
+	            var hitLeft = this.x - this.radius <= 0;
+	            var hitRight = this.x + this.radius >= this.boardWidth;
+	            var hitTop = this.y - this.radius <= 0;
+	            var hitBottom = this.y + this.radius >= this.boardHeight;
+
+	            if (hitLeft || hitRight) {
+	                this.vx = -this.vx;
+	            } else if (hitTop || hitBottom) {
+	                this.vy = -this.vy;
+	            }
+	        }
+	    }, {
+	        key: 'paddleCollision',
+	        value: function paddleCollision(paddle1, paddle2) {
+	            if (this.vx > 0) {
+	                var paddle = paddle2.coordinates(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
+
+	                var _paddle = _slicedToArray(paddle, 4),
+	                    leftX = _paddle[0],
+	                    rightX = _paddle[1],
+	                    topY = _paddle[2],
+	                    bottomY = _paddle[3];
+
+	                if (this.x + this.radius >= leftX && this.x + this.radius <= rightX && this.y >= topY && this.y <= bottomY) {
+	                    this.vx = -this.vx;
+	                    this.direction *= -1;
+	                }
+	            } else {
+	                var _paddle2 = paddle1.coordinates(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
+
+	                var _paddle3 = _slicedToArray(_paddle2, 4),
+	                    _leftX = _paddle3[0],
+	                    _rightX = _paddle3[1],
+	                    _topY = _paddle3[2],
+	                    _bottomY = _paddle3[3];
+
+	                if (this.x - this.radius <= _rightX && this.x - this.radius >= _leftX && this.y >= _topY && this.y <= _bottomY) {
+	                    this.vx = -this.vx;
+	                    this.direction *= -1;
+	                }
+	            }
+	        }
+
+	        //randomly assigns one of two colors to the murder ball
+
+	    }, {
+	        key: 'colorPicker',
+	        value: function colorPicker() {
+	            return Math.random() < 0.5 ? 'red' : 'pink';
+	        }
+	    }, {
+	        key: 'renderMurderVolley',
+	        value: function renderMurderVolley(svg, paddle1, paddle2, direction) {
+	            this.murderVolley1.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley2.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley3.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley4.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley5.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley6.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley7.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley8.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley9.render(svg, paddle1, paddle2, direction);
+	            this.murderVolley10.render(svg, paddle1, paddle2, direction);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render(svg, paddle1, paddle2) {
+
+	            //updates the murder ball location every 9 render frames
+	            if (this.renderCount % 9 === 0) {
+	                this.x += this.vx;
+	                this.y += this.vy;
+	            }
+
+	            //changes direction every 100 render frames
+	            if (this.renderCount % 100 === 0) {
+	                this.setNewDirection();
+	            }
+
+	            this.renderCount++;
+
+	            this.wallCollision();
+	            this.paddleCollision(paddle1, paddle2);
+
+	            //prevents the murderball from being rendered
+	            //when it's not required
+	            if (this.murderBallIsActive) {
+	                var ball = document.createElementNS(_settings.SVG_NS, 'circle');
+	                ball.setAttributeNS(null, 'cx', this.x);
+	                ball.setAttributeNS(null, 'cy', this.y);
+	                ball.setAttributeNS(null, 'r', this.radius);
+	                ball.setAttributeNS(null, 'fill', this.colorPicker());
+
+	                svg.appendChild(ball);
+	                this.renderMurderVolley(svg, paddle1, paddle2, -1);
+
+	                var rightGoal = this.x + this.radius >= this.boardWidth;
+	                var leftGoal = this.x - this.radius <= 0;
+
+	                if (rightGoal) {
+	                    this.murderVolley1.launchVolley(1);
+	                    this.murderVolley2.launchVolley(1);
+	                    this.murderVolley3.launchVolley(1);
+	                    this.murderVolley4.launchVolley(1);
+	                    this.murderVolley5.launchVolley(1);
+	                    this.murderVolley6.launchVolley(1);
+	                    this.murderVolley7.launchVolley(1);
+	                    this.murderVolley8.launchVolley(1);
+	                    this.murderVolley9.launchVolley(1);
+	                    this.murderVolley10.launchVolley(1);
+	                    this.stop();
+	                } else if (leftGoal) {
+	                    this.murderVolley1.launchVolley(-1);
+	                    this.murderVolley2.launchVolley(-1);
+	                    this.murderVolley3.launchVolley(-1);
+	                    this.murderVolley4.launchVolley(-1);
+	                    this.murderVolley5.launchVolley(-1);
+	                    this.murderVolley6.launchVolley(-1);
+	                    this.murderVolley7.launchVolley(-1);
+	                    this.murderVolley8.launchVolley(-1);
+	                    this.murderVolley9.launchVolley(-1);
+	                    this.murderVolley10.launchVolley(-1);
+	                    this.stop();
+	                }
+	            }
+
+	            this.renderMurderVolley(svg, paddle1, paddle2);
+	        }
+	    }]);
+
+	    return MurderBall;
+	}();
+
+	exports.default = MurderBall;
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _settings = __webpack_require__(10);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var MurderVolley = function () {
+	    function MurderVolley(radius, boardWidth, boardHeight, color1, color2, vy, vx) {
+	        _classCallCheck(this, MurderVolley);
+
+	        this.radius = radius;
+	        this.boardWidth = boardWidth;
+	        this.boardHeight = boardHeight;
+	        this.color1 = color1;
+	        this.color2 = color2;
+
+	        this.vx = vx;
+	        this.vy = vy;
+
+	        this.volleyBallIsActive = false;
+	    }
+
+	    _createClass(MurderVolley, [{
+	        key: 'launchVolley',
+	        value: function launchVolley(direction) {
+	            if (this.volleyBallIsActive) {
+	                return;
+	            }
+
+	            this.volleyBallIsActive = true;
+	            this.direction = direction;
+
+	            this.x = this.boardWidth / 2;
+	            this.y = this.boardHeight / 2;
+	        }
+	    }, {
+	        key: 'stopVolley',
+	        value: function stopVolley() {
+	            this.volleyBallIsActive = false;
+	        }
+	    }, {
+	        key: 'wallCollision',
+	        value: function wallCollision() {
+	            var hitTop = this.y - this.radius <= 0;
+	            var hitBottom = this.y + this.radius >= this.boardHeight;
+
+	            if (hitTop || hitBottom) {
+	                this.vy = -this.vy;
+	            }
+	        }
+	    }, {
+	        key: 'paddleCollision',
+	        value: function paddleCollision(paddle1, paddle2) {
+	            if (this.vx > 0) {
+	                var paddle = paddle2.coordinates(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
+
+	                var _paddle = _slicedToArray(paddle, 4),
+	                    leftX = _paddle[0],
+	                    rightX = _paddle[1],
+	                    topY = _paddle[2],
+	                    bottomY = _paddle[3];
+
+	                if (this.x + this.radius >= leftX && this.x + this.radius <= rightX && this.y >= topY && this.y <= bottomY) {
+	                    this.vx = -this.vx;
+	                }
+	            } else {
+	                var _paddle2 = paddle1.coordinates(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
+
+	                var _paddle3 = _slicedToArray(_paddle2, 4),
+	                    _leftX = _paddle3[0],
+	                    _rightX = _paddle3[1],
+	                    _topY = _paddle3[2],
+	                    _bottomY = _paddle3[3];
+
+	                if (this.x - this.radius <= _rightX && this.x - this.radius >= _leftX && this.y >= _topY && this.y <= _bottomY) {
+	                    this.vx = -this.vx;
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'goal',
+	        value: function goal(paddle) {
+	            paddle.score++;
+	        }
+	    }, {
+	        key: 'screenShake',
+	        value: function screenShake() {
+	            $('#game').effect('shake', {
+	                times: 1,
+	                distance: 5
+	            }, 100);
+	        }
+	    }, {
+	        key: 'colorPicker',
+	        value: function colorPicker() {
+	            return Math.random() < 0.5 ? this.color1 : this.color2;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render(svg, paddle1, paddle2) {
+
+	            if (!this.volleyBallIsActive) {
+	                return;
+	            }
+
+	            this.wallCollision();
+	            this.paddleCollision(paddle1, paddle2);
+
+	            this.x += this.vx * this.direction;
+	            this.y += this.vy;
+
+	            var ball = document.createElementNS(_settings.SVG_NS, 'circle');
+
+	            ball.setAttributeNS(null, 'cx', this.x);
+	            ball.setAttributeNS(null, 'cy', this.y);
+	            ball.setAttributeNS(null, 'r', this.radius);
+	            ball.setAttributeNS(null, 'fill', this.colorPicker());
+
+	            svg.appendChild(ball);
+
+	            var rightGoal = this.x + this.radius >= this.boardWidth;
+	            var leftGoal = this.x - this.radius <= 0;
+
+	            if (rightGoal) {
+
+	                this.screenShake();
+	                this.stopVolley();
+	                this.goal(paddle1);
+	            } else if (leftGoal) {
+
+	                this.screenShake();
+	                this.stopVolley();
+	                this.goal(paddle2);
+	            }
+	        }
+	    }]);
+
+	    return MurderVolley;
+	}();
+
+	exports.default = MurderVolley;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! jQuery UI - v1.12.1 - 2016-09-14
