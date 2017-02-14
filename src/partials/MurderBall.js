@@ -1,21 +1,18 @@
 import {
     SVG_NS
 } from '../settings';
+import Ball from './Ball';
 
-//var jQuery = require('jquery');
-//require('jquery-ui');
-
-export default class Ball {
+export default class MurderBall {
     constructor(radius, boardWidth, boardHeight) {
         this.radius = radius;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
-        this.direction = Math.random() < 0.5 ? 1 : -1;
-        this.showMurderBall = false;
+        this.direction = -1;
 
         this.ping = new Audio('public/sounds/pong-04.wav');
-
         this.reset();
+        this.count = 0;
 
     }
 
@@ -23,6 +20,10 @@ export default class Ball {
         this.x = this.boardWidth / 2;
         this.y = this.boardHeight / 2;
 
+        this.setNewDirection();
+    }
+
+    setNewDirection() {
         this.vy = 0;
 
         while (this.vy === 0) {
@@ -40,12 +41,8 @@ export default class Ball {
 
         if (hitLeft || hitRight) {
             this.vx = -this.vx;
-          //  this.ping.play();
-        //
         } else if (hitTop || hitBottom) {
             this.vy = -this.vy;
-          //  this.ping.play();
-        //  this.screenShake();
         }
     }
 
@@ -61,8 +58,7 @@ export default class Ball {
                 this.y <= bottomY
             ) {
                 this.vx = -this.vx;
-
-              //  this.ping.play();
+                this.direction *= -1;
             }
 
         } else {
@@ -75,8 +71,7 @@ export default class Ball {
                 this.y <= bottomY
             ) {
                 this.vx = -this.vx;
-
-              //  this.ping.play();
+                this.direction *= -1;
             }
 
         }
@@ -87,14 +82,28 @@ export default class Ball {
         this.reset();
     }
 
-    screenShake(){
-      $('#game').effect( 'shake', {times:2, distance:5}, 250 );
+    screenShake() {
+        $('#game').effect('shake', {times: 2,distance: 5}, 250);
     }
+
+    colorPicker() {
+        return Math.random() < 0.5 ? 'red' : 'pink';
+    }
+
 
     render(svg, paddle1, paddle2) {
 
-        this.x += this.vx;
-        this.y += this.vy;
+
+        if (this.count % 9 === 0) {
+            this.x += this.vx;
+            this.y += this.vy;
+        }
+
+        if (this.count % 100 === 0) {
+            this.setNewDirection();
+        }
+
+        this.count++;
 
         this.wallCollision();
         this.paddleCollision(paddle1, paddle2);
@@ -103,7 +112,7 @@ export default class Ball {
         ball.setAttributeNS(null, 'cx', this.x);
         ball.setAttributeNS(null, 'cy', this.y);
         ball.setAttributeNS(null, 'r', this.radius);
-        ball.setAttributeNS(null, 'fill', '#fff');
+        ball.setAttributeNS(null, 'fill', this.colorPicker());
 
         svg.appendChild(ball);
 
@@ -111,14 +120,13 @@ export default class Ball {
         const leftGoal = this.x - this.radius <= 0;
 
 
+
         if (rightGoal) {
-            this.goal(paddle1);
-            this.direction = 1;
-              this.screenShake();
+            this.screenShake();
+            //fire murder volley at
         } else if (leftGoal) {
-            this.goal(paddle2);
-            this.direction = -1;
-              this.screenShake();
+
+            this.screenShake();
         }
     }
 }

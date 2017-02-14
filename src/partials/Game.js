@@ -6,6 +6,7 @@ import Board from './Board';
 import Paddle from './Paddle';
 import Ball from './Ball';
 import Score from './Score';
+import MurderBall from './MurderBall';
 
 export default class Game {
 
@@ -42,8 +43,7 @@ export default class Game {
             KEYS.down);
 
         this.ball = new Ball(8, this.width, this.height);
-
-        //constructor(x, y, size)
+        this.murderBall = new MurderBall(5, this.width, this.height);
 
         this.player1Score = new Score(50, 30, 30, 'LEFT', this.width);
         this.player2Score = new Score(50, 30, 30, 'RIGHT', this.width);
@@ -76,8 +76,13 @@ export default class Game {
 
         this.ball.render(svg, this.paddle1, this.paddle2);
 
+
         this.player1Score.render(svg, this.paddle1.score);
         this.player2Score.render(svg, this.paddle2.score);
+
+      
+          this.murderBall.render(svg, this.paddle1, this.paddle2);
+
 
     }
 
