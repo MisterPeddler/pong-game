@@ -10,7 +10,8 @@ export default class Paddle {
         this.height = height;
         this.x = x;
         this.y = y;
-        this.speed = 10;
+        this.speed = 0;
+        this.maxSpeed = 10;
         this.score = 0;
         this.gameIsNotPaused = true;
 
@@ -53,18 +54,19 @@ export default class Paddle {
         });
     }
 
-
-    up() {
-      if(this.speed < 10){
+    incrementSpeed(){
+      if(this.speed < this.maxSpeed){
         this.speed = this.speed + 0.5;
       }
+    }
+
+    up() {
+      this.incrementSpeed();
         this.y = Math.max(0, this.y - this.speed);
     }
 
     down() {
-      if(this.speed < 10){
-        this.speed = this.speed + 0.5;
-      }
+      this.incrementSpeed();
         this.y = Math.min(this.boardHeight - this.height, this.y + this.speed);
     }
 

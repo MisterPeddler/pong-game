@@ -1,12 +1,26 @@
 import { SVG_NS } from '../settings';
 
 export default class Score {
-    constructor(x, y, size) {
-        this.x = x;
+    constructor(distanceFromCenter, y, size, side, gameWidth) {
+        this.distanceFromCenter = distanceFromCenter;
+        this.x = 0;
         this.y = y;
         this.size = size;
+        this.gameWidth = gameWidth;
+        this.side = side;
+
     }
 
+    setXPos(element){
+      let elementWidth = element.getBoundingClientRect().width;
+
+      if(this.side === 'LEFT'){
+        this.x = this.gameWidth/2 - elementWidth - this.distanceFromCenter;
+      }else if(this.side === 'RIGHT'){
+        this.x = this.gameWidth/2 + this.distanceFromCenter;
+      }
+
+    }
 
     render(svg, points) {
 
@@ -19,6 +33,8 @@ export default class Score {
         score.innerHTML = points;
 
         svg.appendChild(score);
+
+        this.setXPos(score);
 
     }
 }

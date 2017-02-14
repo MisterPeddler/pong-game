@@ -43,8 +43,10 @@ export default class Game {
 
         this.ball = new Ball(8, this.width, this.height);
 
-        this.player1Score = new Score(this.width / 2 - 50, 30, 30);
-        this.player2Score = new Score(this.width / 2 + 50, 30, 30);
+        //constructor(x, y, size)
+
+        this.player1Score = new Score(50, 30, 30, 'LEFT', this.width);
+        this.player2Score = new Score(50, 30, 30, 'RIGHT', this.width);
 
         document.addEventListener('keydown', event => {
             if (event.keyCode === KEYS.spaceBar) {
@@ -55,8 +57,6 @@ export default class Game {
     }
 
     render() {
-
-
 
         if (this.pause) {
             return
