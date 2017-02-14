@@ -10,7 +10,7 @@ export default class Ball {
         this.radius = radius;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
-        this.direction = 1;
+        this.direction = Math.random() < 0.5 ? 1 : -1;
 
 
         this.ping = new Audio('public/sounds/pong-04.wav');
