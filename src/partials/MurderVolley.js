@@ -2,41 +2,49 @@ import {
     SVG_NS
 } from '../settings';
 
+export default class MurderVolley {
+    constructor(radius,
+        boardWidth,
+        boardHeight,
+        color1,
+        color2,
+        vy,
+        vx) {
 
-export default class Ball {
-    constructor(radius, boardWidth, boardHeight) {
         this.radius = radius;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
-        this.direction = Math.random() < 0.5 ? 1 : -1;
+        this.color1 = color1;
+        this.color2 = color2;
 
-        this.ping = new Audio('public/sounds/pong-04.wav');
+        this.vx = vx;
+        this.vy = vy;
 
-        this.reset();
+        this.volleyBallIsActive = false;
     }
 
-    reset() {
-        this.x = this.boardWidth / 2;
-        this.y = this.boardHeight / 2;
-
-        this.vy = 0;
-
-        while (this.vy === 0) {
-            this.vy = Math.floor(Math.random() * 10 - 5);
+    launchVolley(direction) {
+        if (this.volleyBallIsActive) {
+            return;
         }
 
-        this.vx = this.direction * (6 - Math.abs(this.vy));
+        this.volleyBallIsActive = true;
+        this.direction = direction;
+
+        this.x = this.boardWidth / 2;
+        this.y = this.boardHeight / 2;
+    }
+
+    stopVolley() {
+        //  this.launchVolley();
+        this.volleyBallIsActive = false;
     }
 
     wallCollision() {
-        const hitLeft = this.x - this.radius <= 0;
-        const hitRight = this.x + this.radius >= this.boardWidth;
         const hitTop = this.y - this.radius <= 0;
         const hitBottom = this.y + this.radius >= this.boardHeight;
 
-        if (hitLeft || hitRight) {
-            this.vx = -this.vx;
-        } else if (hitTop || hitBottom) {
+        if (hitTop || hitBottom) {
             this.vy = -this.vy;
         }
     }
@@ -72,29 +80,37 @@ export default class Ball {
 
     goal(paddle) {
         paddle.score++;
-        this.reset();
     }
 
     screenShake() {
         $('#game').effect('shake', {
-            times: 2,
+            times: 1,
             distance: 5
-        }, 250);
+        }, 100);
     }
 
-    render(svg, paddle1, paddle2, murderBall) {
+    colorPicker() {
+        return Math.random() < 0.5 ? this.color1 : this.color2;
+    }
 
-        this.x += this.vx;
-        this.y += this.vy;
+    render(svg, paddle1, paddle2) {
+
+        if (!this.volleyBallIsActive) {
+            return;
+        }
 
         this.wallCollision();
         this.paddleCollision(paddle1, paddle2);
 
+        this.x += (this.vx * this.direction);
+        this.y += this.vy;
+
         let ball = document.createElementNS(SVG_NS, 'circle');
+
         ball.setAttributeNS(null, 'cx', this.x);
         ball.setAttributeNS(null, 'cy', this.y);
         ball.setAttributeNS(null, 'r', this.radius);
-        ball.setAttributeNS(null, 'fill', '#fff');
+        ball.setAttributeNS(null, 'fill', this.colorPicker());
 
         svg.appendChild(ball);
 
@@ -102,26 +118,20 @@ export default class Ball {
         const leftGoal = this.x - this.radius <= 0;
 
         if (rightGoal) {
-            this.direction = 1;
-            this.goal(paddle1);
 
             this.screenShake();
-
-            if (Math.abs(paddle1.score - paddle2.score) === 5) {
-                murderBall.release('RIGHT');
-            }
+            this.stopVolley();
+            this.goal(paddle1);
 
         } else if (leftGoal) {
 
-            this.direction = -1;
-            this.goal(paddle2);
-
             this.screenShake();
-
-            if (Math.abs(paddle1.score - paddle2.score) === 5) {
-                murderBall.release('LEFT');
-            }
+            this.stopVolley();
+            this.goal(paddle2);
         }
+
+
+
 
     }
 }

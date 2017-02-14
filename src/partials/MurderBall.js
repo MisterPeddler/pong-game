@@ -2,27 +2,56 @@ import {
     SVG_NS
 } from '../settings';
 import Ball from './Ball';
+import MurderVolley from './MurderVolley';
+
 
 export default class MurderBall {
     constructor(radius, boardWidth, boardHeight) {
         this.radius = radius;
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
-        this.direction = -1;
+        this.renderCount = 0;
 
-        this.ping = new Audio('public/sounds/pong-04.wav');
-        this.reset();
-        this.count = 0;
+        this.murderVolley1 = new MurderVolley(5, this.boardWidth, this.boardHeight, 'black', 'red', -5, 1);
+        this.murderVolley2 = new MurderVolley(6, this.boardWidth, this.boardHeight, 'black', 'red', -4, 2);
+        this.murderVolley3 = new MurderVolley(7, this.boardWidth, this.boardHeight, 'black', 'red', -3, 3);
+        this.murderVolley4 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'red', -2, 4);
+        this.murderVolley5 = new MurderVolley(9, this.boardWidth, this.boardHeight, 'black', 'red', -1, 5);
+        this.murderVolley6 = new MurderVolley(10, this.boardWidth, this.boardHeight, 'black', 'red', 1, 5);
+        this.murderVolley7 = new MurderVolley(11, this.boardWidth, this.boardHeight, 'black', 'red', 2, 4);
+        this.murderVolley8 = new MurderVolley(12, this.boardWidth, this.boardHeight, 'black', 'red', 3, 3);
+        this.murderVolley9 = new MurderVolley(13, this.boardWidth, this.boardHeight, 'black', 'red', 4, 2);
+        this.murderVolley10 = new MurderVolley(14, this.boardWidth, this.boardHeight, 'black', 'red', 5, 1);
+
+
+        this.murderBallIsActive = false;
 
     }
 
-    reset() {
+    release(rightOrLeft) {
+        //stops new muder balls from appearing while one is active
+        if (this.murderBallIsActive) {
+            return;
+        }
+
+        //sends the murder ball left or right based on who earned it
+        if (rightOrLeft === 'RIGHT') {
+            this.direction = 1;
+        } else if (rightOrLeft === 'LEFT') {
+            this.direction = -1;
+        }
+
+        this.murderBallIsActive = true;
+
+        //starts the murder ball in the middle
         this.x = this.boardWidth / 2;
         this.y = this.boardHeight / 2;
 
         this.setNewDirection();
     }
 
+
+    //changes the direction of the murder ball
     setNewDirection() {
         this.vy = 0;
 
@@ -32,6 +61,11 @@ export default class MurderBall {
 
         this.vx = this.direction * (6 - Math.abs(this.vy));
     }
+
+    stop() {
+        this.murderBallIsActive = false;
+    }
+
 
     wallCollision() {
         const hitLeft = this.x - this.radius <= 0;
@@ -77,56 +111,87 @@ export default class MurderBall {
         }
     }
 
-    goal(paddle) {
-        paddle.score++;
-        this.reset();
-    }
 
-    screenShake() {
-        $('#game').effect('shake', {times: 2,distance: 5}, 250);
-    }
-
+    //randomly assigns one of two colors to the murder ball
     colorPicker() {
         return Math.random() < 0.5 ? 'red' : 'pink';
     }
 
+    renderMurderVolley(svg, paddle1, paddle2, direction) {
+        this.murderVolley1.render(svg, paddle1, paddle2, direction);
+        this.murderVolley2.render(svg, paddle1, paddle2, direction);
+        this.murderVolley3.render(svg, paddle1, paddle2, direction);
+        this.murderVolley4.render(svg, paddle1, paddle2, direction);
+        this.murderVolley5.render(svg, paddle1, paddle2, direction);
+        this.murderVolley6.render(svg, paddle1, paddle2, direction);
+        this.murderVolley7.render(svg, paddle1, paddle2, direction);
+        this.murderVolley8.render(svg, paddle1, paddle2, direction);
+        this.murderVolley9.render(svg, paddle1, paddle2, direction);
+        this.murderVolley10.render(svg, paddle1, paddle2, direction);
+    }
 
     render(svg, paddle1, paddle2) {
 
 
-        if (this.count % 9 === 0) {
+        //updates the murder ball location every 9 render frames
+        if (this.renderCount % 9 === 0) {
             this.x += this.vx;
             this.y += this.vy;
         }
 
-        if (this.count % 100 === 0) {
+        //changes direction every 100 render frames
+        if (this.renderCount % 100 === 0) {
             this.setNewDirection();
         }
 
-        this.count++;
+        this.renderCount++;
 
         this.wallCollision();
         this.paddleCollision(paddle1, paddle2);
 
-        let ball = document.createElementNS(SVG_NS, 'circle');
-        ball.setAttributeNS(null, 'cx', this.x);
-        ball.setAttributeNS(null, 'cy', this.y);
-        ball.setAttributeNS(null, 'r', this.radius);
-        ball.setAttributeNS(null, 'fill', this.colorPicker());
+        //prevents the murderball from being rendered
+        //when it's not required
+        if (this.murderBallIsActive) {
+            let ball = document.createElementNS(SVG_NS, 'circle');
+            ball.setAttributeNS(null, 'cx', this.x);
+            ball.setAttributeNS(null, 'cy', this.y);
+            ball.setAttributeNS(null, 'r', this.radius);
+            ball.setAttributeNS(null, 'fill', this.colorPicker());
 
-        svg.appendChild(ball);
+            svg.appendChild(ball);
+            this.renderMurderVolley(svg, paddle1, paddle2, -1);
 
-        const rightGoal = this.x + this.radius >= this.boardWidth;
-        const leftGoal = this.x - this.radius <= 0;
+            const rightGoal = this.x + this.radius >= this.boardWidth;
+            const leftGoal = this.x - this.radius <= 0;
 
-
-
-        if (rightGoal) {
-            this.screenShake();
-            //fire murder volley at
-        } else if (leftGoal) {
-
-            this.screenShake();
+            if (rightGoal) {
+                this.murderVolley1.launchVolley(1);
+                this.murderVolley2.launchVolley(1);
+                this.murderVolley3.launchVolley(1);
+                this.murderVolley4.launchVolley(1);
+                this.murderVolley5.launchVolley(1);
+                this.murderVolley6.launchVolley(1);
+                this.murderVolley7.launchVolley(1);
+                this.murderVolley8.launchVolley(1);
+                this.murderVolley9.launchVolley(1);
+                this.murderVolley10.launchVolley(1);
+                this.stop();
+            } else if (leftGoal) {
+                this.murderVolley1.launchVolley(-1);
+                this.murderVolley2.launchVolley(-1);
+                this.murderVolley3.launchVolley(-1);
+                this.murderVolley4.launchVolley(-1);
+                this.murderVolley5.launchVolley(-1);
+                this.murderVolley6.launchVolley(-1);
+                this.murderVolley7.launchVolley(-1);
+                this.murderVolley8.launchVolley(-1);
+                this.murderVolley9.launchVolley(-1);
+                this.murderVolley10.launchVolley(-1);
+                this.stop();
+            }
         }
+
+        this.renderMurderVolley(svg, paddle1, paddle2);
+
     }
 }

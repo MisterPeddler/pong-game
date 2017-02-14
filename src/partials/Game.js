@@ -7,6 +7,7 @@ import Paddle from './Paddle';
 import Ball from './Ball';
 import Score from './Score';
 import MurderBall from './MurderBall';
+import MurderVolley from './MurderVolley';
 
 export default class Game {
 
@@ -45,6 +46,7 @@ export default class Game {
         this.ball = new Ball(8, this.width, this.height);
         this.murderBall = new MurderBall(5, this.width, this.height);
 
+
         this.player1Score = new Score(50, 30, 30, 'LEFT', this.width);
         this.player2Score = new Score(50, 30, 30, 'RIGHT', this.width);
 
@@ -53,13 +55,12 @@ export default class Game {
                 this.pause = !this.pause;
             }
         });
-
     }
 
     render() {
 
         if (this.pause) {
-            return
+            return;
         }
 
         this.gameElement.innerHTML = '';
@@ -74,15 +75,11 @@ export default class Game {
         this.paddle1.render(svg);
         this.paddle2.render(svg);
 
-        this.ball.render(svg, this.paddle1, this.paddle2);
-
+        this.murderBall.render(svg, this.paddle1, this.paddle2);
+        this.ball.render(svg, this.paddle1, this.paddle2, this.murderBall);
 
         this.player1Score.render(svg, this.paddle1.score);
         this.player2Score.render(svg, this.paddle2.score);
-
-      
-          this.murderBall.render(svg, this.paddle1, this.paddle2);
-
 
     }
 

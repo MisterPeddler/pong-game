@@ -21,7 +21,6 @@ export default class Paddle {
         document.addEventListener('keydown', event => {
             switch (event.keyCode) {
                 case up:
-                      console.log('up pressed');
                       this.speed = 0;
                       this.upPressed = true;
                     break;
@@ -29,7 +28,6 @@ export default class Paddle {
                 case down:
                       this.downPressed = true;
                       this.speed = 0;
-                        console.log('down pressed');
                     break;
 
                 case KEYS.spaceBar:
@@ -43,12 +41,10 @@ export default class Paddle {
             switch (event.keyCode) {
                 case up:
                       this.upPressed = false;
-                        console.log('up released');
                     break;
 
                 case down:
                     this.downPressed = false;
-                      console.log('down released');
                     break;
             }
         });
