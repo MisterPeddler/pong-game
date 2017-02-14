@@ -12,16 +12,16 @@ export default class MurderBall {
         this.boardHeight = boardHeight;
         this.renderCount = 0;
 
-        this.murderVolley1 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -5, 1);
-        this.murderVolley2 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -4, 2);
-        this.murderVolley3 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -3, 3);
-        this.murderVolley4 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -2, 4);
-        this.murderVolley5 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', -1, 5);
-        this.murderVolley6 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 1, 5);
-        this.murderVolley7 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 2, 4);
-        this.murderVolley8 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 3, 3);
-        this.murderVolley9 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 4, 2);
-        this.murderVolley10 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'white', 'white', 5, 1);
+        this.murderVolley1 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', -5, 1);
+        this.murderVolley2 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', -4, 2);
+        this.murderVolley3 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', -3, 3);
+        this.murderVolley4 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', -2, 4);
+        this.murderVolley5 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', -1, 5);
+        this.murderVolley6 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', 1, 5);
+        this.murderVolley7 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', 2, 4);
+        this.murderVolley8 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', 3, 3);
+        this.murderVolley9 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', 4, 2);
+        this.murderVolley10 = new MurderVolley(8, this.boardWidth, this.boardHeight, 'black', 'white', 5, 1);
 
 
         this.murderBallIsActive = false;
