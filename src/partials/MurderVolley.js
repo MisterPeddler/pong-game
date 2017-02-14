@@ -119,14 +119,16 @@ export default class MurderVolley {
         if (rightGoal) {
 
             this.screenShake();
+              this.goal(paddle1);
             this.stopVolley();
-            this.goal(paddle1);
+
 
         } else if (leftGoal) {
 
             this.screenShake();
-            this.stopVolley();
             this.goal(paddle2);
+            this.stopVolley();
+
         }
 
     }
